@@ -59,7 +59,7 @@
 
     <script>
         let grid = [];
-        let currentImage = "";
+        let currentImage = "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/brick.gif";
         let map;
         function createWorld() {
             for (let z = 0; z < 10; z++) {
@@ -69,6 +69,7 @@
                 for (let i = 0; i < 5; i++) {
                     let tile = document.createElement('div');
                     tile.classList = "tiles";
+                    tile.onmouseup = function(){changeBG(tile, currentImage)};
                     this.newObj = {};
                     this.newObj.block = tile;
                     newYarr.push(this.newObj);
@@ -83,6 +84,7 @@
         const music = new Audio("https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/sounds/loadingScreen.mp3");
         music.currentTime = 0;
         music.play();
+        
         function sanity() {
             music.currentTime = 0;
             music.play();
@@ -91,6 +93,10 @@
         music.currentTime = 0;
         music.play();
         let musicPlayer = setInterval(sanity, music.duration * 1000);
+        };
+
+        function changeBG(element, src){
+            element.style.backgroundImage = "url(" + src + ")";
         }
 
 
