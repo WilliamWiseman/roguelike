@@ -1,9 +1,75 @@
 <!DOCTYPE html>
-<html>
-<head>
 
-</head>
+<html>
+
 <body>
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            text-align: center;
+            background-color: rgb(43, 41, 41);
+            height: 100%;
+        }
+
+        ;
+
+        .gameArea {
+            text-align: center;
+            height: 100%;
+        }
+
+        .tiles {
+            height: 7.5vw;
+            width: 7.5vw;
+            background-image: url("https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/darkBrick.gif");
+            background-repeat: no-repeat;
+            background-size: cover;
+            border: 1px solid transparent;
+        }
+
+        .tiles:hover {
+            border: 1px solid white;
+        }
+        .bar{
+            background-color:rgb(43, 41, 41);
+            width:100%;
+            height:13vw;
+            border-top:1vw solid white;
+            margin-top:1vw;
+        }
+    </style>
+    <div id="add" class="gameArea"></div>
+    <div id="bar" class="bar"></div>
+    <script>
+        let grid = [];
+        let currentImage = "";
+        let map;
+        function createWorld() {
+            for (let z = 0; z < 10; z++) {
+                let newYarr = [];
+                let miniDiv = document.createElement('div');
+                miniDiv.style = "display:inline-block";
+                for (let i = 0; i < 5; i++) {
+                    let tile = document.createElement('div');
+                    tile.classList = "tiles";
+                    this.newObj = {};
+                    this.newObj.block = tile;
+                    newYarr.push(this.newObj);
+                    miniDiv.appendChild(tile);
+                }
+                grid.push(newYarr);
+                document.getElementById('add').appendChild(miniDiv);
+            }
+        }
+        createWorld();
+
+
+
+    </script>
 
 </body>
+
 </html>
