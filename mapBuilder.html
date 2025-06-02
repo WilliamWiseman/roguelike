@@ -34,23 +34,38 @@
             border: 1px solid white;
         }
 
+        .tile {
+            height: 7.5vw;
+            width: 7.5vw;
+            background-size: cover;
+            background-repeat:no-repeat;
+            border: 1px solid transparent;
+            display:inline-block;
+        }
+
+        .tile:hover {
+            border: 1px solid white;
+        }
+
         .bar {
             background-color: rgb(43, 41, 41);
             width: 100%;
             height: 13vw;
             border-top: 1vw solid white;
             margin-top: 1vw;
+            display:inline-block;
         }
-        .btn{
-        width:4vw;
-        height:4vw;
-        position:fixed;
-        top:5px;
-        left:5px;
-        z-index:999;
-        background-color:red;
-        border:0px solid transparent;
-        border-radius:50%;
+
+        .btn {
+            width: 4vw;
+            height: 4vw;
+            position: fixed;
+            top: 5px;
+            left: 5px;
+            z-index: 999;
+            background-color: red;
+            border: 0px solid transparent;
+            border-radius: 50%;
         }
     </style>
     <div id="add" class="gameArea"></div>
@@ -69,7 +84,7 @@
                 for (let i = 0; i < 5; i++) {
                     let tile = document.createElement('div');
                     tile.classList = "tiles";
-                    tile.onmouseup = function(){changeBG(tile, currentImage)};
+                    tile.onmouseup = function () { changeBG(tile, currentImage) };
                     this.newObj = {};
                     this.newObj.block = tile;
                     newYarr.push(this.newObj);
@@ -84,21 +99,34 @@
         const music = new Audio("https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/sounds/loadingScreen.mp3");
         music.currentTime = 0;
         music.play();
-        
+
         function sanity() {
             music.currentTime = 0;
             music.play();
         }
-        function MUSIC(){
-        music.currentTime = 0;
-        music.play();
-        let musicPlayer = setInterval(sanity, music.duration * 1000);
+        function MUSIC() {
+            music.currentTime = 0;
+            music.play();
+            let musicPlayer = setInterval(sanity, music.duration * 1000);
         };
 
-        function changeBG(element, src){
+        function changeBG(element, src) {
             element.style.backgroundImage = "url(" + src + ")";
         }
 
+        function BGchanger(src){
+            let brick = document.createElement('div');
+            brick.classList = "tile";
+            brick.style.backgroundImage = "url(" + src + ")";
+            brick.onclick = function() {
+                currentImage = src;
+            }
+            document.getElementById('bar').appendChild(brick);
+
+        }
+
+        BGchanger("https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/darkBrick.gif");
+        BGchanger("https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/brick.gif");
 
 
     </script>
