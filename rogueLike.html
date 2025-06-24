@@ -1,1 +1,86 @@
+<!DOCTYPE html>
+<html>
 
+<head>
+</head>
+
+<body>
+
+    <style>
+        body {
+            background-color: white;
+        }
+    </style>
+    <script>
+        function hitbox(x, y, width, height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            return this;
+        }
+
+        function creature(name, x, y, height, width, hp, src) {
+            this.name = name;
+            this.maxHp = hp;
+            this.hp = hp;
+            this.x = x;
+            this.y = y;
+            this.height = height;
+            this.width = width;
+            this.momX = 0;
+            this.momY = 0;
+            creature.prototype.appear = function () {
+                this.dom = document.createElement("img");
+                this.dom.src = src;
+                this.dom.style = `position:absolute;left:$(this.x)px;top:$(this.y)px;height:$(this.height)px;width:$(this.width);`;
+                document.body.appendChild(this.dom);
+            }
+            creature.prototype.move = function () {
+                this.x += this.momX;
+                this.y += this.momY;
+                this.dom.style.left = `$(this.x)px`;
+                this.dom.style.top = `$(this.y)px`;
+                // add collision detection bro
+                console.log("Movement Func ran successfully")
+            }
+
+        }
+        let creatureArr = [];
+
+        let PLAYER = new creature("Isabella", 0, 0, 60, 60, 100, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/brick.gif");
+        creatureArr.push(PLAYER);
+        creatureArr[0].appear();
+
+
+        document.addEventListener("keydown", function (event) {
+            event.preventDefault();
+            let key = event.key;
+            key = key.toLowerCase();
+            switch (key) {
+                case "a":
+                    creatureArr[0].momX = -4;
+                    break;
+                case "d":
+                    creatureArr[0].momX = 4;
+                    break;
+                case "w":
+                    creatureArr[0].momY = -4;
+                    break;
+                case "s":
+                    creatureArr[0].momY = 4;
+                    break;
+            }
+        });
+        function gameLoop(){
+            for(let i = 0; i < creatureArr.length; i++){
+                creatureArr[i].move();
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+
+</html>
