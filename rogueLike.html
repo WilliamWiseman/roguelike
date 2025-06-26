@@ -30,27 +30,41 @@
             this.width = width;
             this.momX = 0;
             this.momY = 0;
-            creature.prototype.appear = function () {
+            this.index = creatureArr.length;
+
+            creature.prototype.appear = function () { //creates the physical DOM object and PUTS IT IN ITS PLACE
                 this.dom = document.createElement("img");
                 this.dom.src = src;
-                this.dom.style = `position:absolute;left:$(this.x)px;top:$(this.y)px;height:$(this.height)px;width:$(this.width);`;
+                this.dom.style.position = "absolute";
+                this.dom.style.left = `${this.x}px`;
+                this.dom.style.top = `${this.y}px`;
+                this.dom.style.height = `${this.height}px`;
+                this.dom.style.width = `${this.width}px`;
                 document.body.appendChild(this.dom);
             }
-            creature.prototype.move = function () {
+
+            creature.prototype.move = function () { //PUTS THAT DOM OBJECT IN ITS PLACE
                 this.x += this.momX;
                 this.y += this.momY;
-                this.dom.style.left = `$(this.x)px`;
-                this.dom.style.top = `$(this.y)px`;
-                // add collision detection bro
-                console.log("Movement Func ran successfully")
+                for(let i = 0; i < wallArr.length; i++){
+                collision(this.index, wallArr[i]);
+                }
+                this.dom.style.left = `${this.x}px`;
+                this.dom.style.top = `${this.y}px`;
             }
 
         }
         let creatureArr = [];
+        let wallArr = [];
 
         let PLAYER = new creature("Isabella", 0, 0, 60, 60, 100, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/brick.gif");
         creatureArr.push(PLAYER);
         creatureArr[0].appear();
+        let wall = new creature("wall", 200, 100, 100, 100, 0, "https://raw.githubusercontent.com/WilliamWiseman/RandomGames/main/images/Rock.gif");
+        wallArr.push(wall);
+        wall.appear();
+
+
 
 
         document.addEventListener("keydown", function (event) {
@@ -59,27 +73,87 @@
             key = key.toLowerCase();
             switch (key) {
                 case "a":
-                    creatureArr[0].momX = -4;
+                    creatureArr[0].momX = -1;
                     break;
                 case "d":
-                    creatureArr[0].momX = 4;
+                    creatureArr[0].momX = 1;
                     break;
                 case "w":
-                    creatureArr[0].momY = -4;
+                    creatureArr[0].momY = -1;
                     break;
                 case "s":
-                    creatureArr[0].momY = 4;
+                    creatureArr[0].momY = 1;4
                     break;
             }
         });
-        function gameLoop(){
-            for(let i = 0; i < creatureArr.length; i++){
+
+        document.addEventListener("keyup", function (event) {
+            event.preventDefault();
+            let key = event.key;
+            key = key.toLowerCase();
+            switch (key) {
+                case "a":
+                    if(creatureArr[0].momX < 0){
+                    creatureArr[0].momX = 0;
+                    }
+                    break;
+                case "d":
+                    if(creatureArr[0].momX > 0){
+                    creatureArr[0].momX = 0;
+                    }
+                    break;
+                case "w":
+                    if(creatureArr[0].momY < 0){
+                    creatureArr[0].momY = 0;
+                    }
+                    break;
+                case "s":
+                    if(creatureArr[0].momY > 0){
+                    creatureArr[0].momY = 0;
+                    }
+                    break;
+            }
+        });
+
+        function gameLoop() {
+            for (let i = 0; i < creatureArr.length; i++) {
                 creatureArr[i].move();
             }
 
             requestAnimationFrame(gameLoop);
         }
         requestAnimationFrame(gameLoop);
+
+        function collision(index, obj){
+            if(creatureArr[index].y <= obj.y + obj.height &&
+             creatureArr[index].y + creatureArr[index].height >= obj.y){
+
+            if(creatureArr[index].x + creatureArr[index].width > obj.x &&
+                creatureArr[index].x < obj.x){
+                    creatureArr[index].x = obj.x - creatureArr[index].width - 1;
+
+                }else if(creatureArr[index].x < obj.x + obj.width &&
+                    creatureArr[index].x + creatureArr[index].width > obj.x + obj.width){
+                    creatureArr[index].x = obj.x + obj.width + 1;
+                    }
+
+             }
+
+             if(creatureArr[index].x <= obj.x + obj.width &&
+             creatureArr[index].x + creatureArr[index].width >= obj.x){
+
+            if(creatureArr[index].y + creatureArr[index].height > obj.y &&
+                creatureArr[index].y < obj.y){
+                    creatureArr[index].y = obj.y - creatureArr[index].height - 1;
+
+                }else if(creatureArr[index].y < obj.y + obj.height &&
+                    creatureArr[index].y + creatureArr[index].height > obj.y + obj.height){
+                    creatureArr[index].y = obj.y + obj.height + 1;
+                    }
+
+             }
+
+        }
     </script>
 </body>
 
