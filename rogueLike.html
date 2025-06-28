@@ -49,7 +49,7 @@
                 for(let i = 0; i < wallArr.length; i++){
                 if(collision(this, wallArr[i])){
                 this.x -= this.momX;
-                this.y -= this.momY;        
+                this.y -= this.momY;
                 }
                 }
                 this.dom.style.left = `${this.x}px`;
@@ -63,9 +63,13 @@
         let PLAYER = new creature("Isabella", 0, 0, 60, 60, 100, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/brick.gif");
         creatureArr.push(PLAYER);
         creatureArr[0].appear();
-        let wall = new creature("wall", 200, 100, 100, 100, 0, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/lightBrick.gif");
+        let wall = new creature("wall", 200, 100, 500, 100, 0, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/lightBrick.gif");
         wallArr.push(wall);
         wall.appear();
+
+        let wall2 = new creature("wall", 200, 500   , 100, 500, 0, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/lightBrick.gif");
+        wallArr.push(wall2);
+        wall2.appear();
 
 
 
@@ -85,7 +89,7 @@
                     creatureArr[0].momY = -1;
                     break;
                 case "s":
-                    creatureArr[0].momY = 1;4
+                    creatureArr[0].momY = 1;
                     break;
             }
         });
