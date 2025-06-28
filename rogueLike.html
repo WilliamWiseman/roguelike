@@ -47,7 +47,10 @@
                 this.x += this.momX;
                 this.y += this.momY;
                 for(let i = 0; i < wallArr.length; i++){
-                collision(this.index, wallArr[i]);
+                if(collision(this, wallArr[i])){
+                this.x -= this.momX;
+                this.y -= this.momY;        
+                }
                 }
                 this.dom.style.left = `${this.x}px`;
                 this.dom.style.top = `${this.y}px`;
@@ -60,7 +63,7 @@
         let PLAYER = new creature("Isabella", 0, 0, 60, 60, 100, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/brick.gif");
         creatureArr.push(PLAYER);
         creatureArr[0].appear();
-        let wall = new creature("wall", 200, 100, 100, 100, 0, "https://raw.githubusercontent.com/WilliamWiseman/RandomGames/main/images/Rock.gif");
+        let wall = new creature("wall", 200, 100, 100, 100, 0, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/lightBrick.gif");
         wallArr.push(wall);
         wall.appear();
 
@@ -124,36 +127,14 @@
         }
         requestAnimationFrame(gameLoop);
 
-        function collision(index, obj){
-            if(creatureArr[index].y <= obj.y + obj.height &&
-             creatureArr[index].y + creatureArr[index].height >= obj.y){
-
-            if(creatureArr[index].x + creatureArr[index].width > obj.x &&
-                creatureArr[index].x < obj.x){
-                    creatureArr[index].x = obj.x - creatureArr[index].width - 1;
-
-                }else if(creatureArr[index].x < obj.x + obj.width &&
-                    creatureArr[index].x + creatureArr[index].width > obj.x + obj.width){
-                    creatureArr[index].x = obj.x + obj.width + 1;
-                    }
-
-             }
-
-             if(creatureArr[index].x <= obj.x + obj.width &&
-             creatureArr[index].x + creatureArr[index].width >= obj.x){
-
-            if(creatureArr[index].y + creatureArr[index].height > obj.y &&
-                creatureArr[index].y < obj.y){
-                    creatureArr[index].y = obj.y - creatureArr[index].height - 1;
-
-                }else if(creatureArr[index].y < obj.y + obj.height &&
-                    creatureArr[index].y + creatureArr[index].height > obj.y + obj.height){
-                    creatureArr[index].y = obj.y + obj.height + 1;
-                    }
-
-             }
-
-        }
+        function collision(a, b) {
+    return !(
+        ((a.y + a.height) < (b.y)) ||
+        (a.y > (b.y + b.height)) ||
+        ((a.x + a.width) < b.x) ||
+        (a.x > (b.x + b.width))
+    );
+}
     </script>
 </body>
 
