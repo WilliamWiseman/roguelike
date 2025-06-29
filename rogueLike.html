@@ -10,8 +10,20 @@
         body {
             background-color: white;
         }
+        .world {
+            background-color:black;
+            position:absolute;
+            left:0;
+            top:0;
+        }
     </style>
+
+    <div class="world" id="world">
+    </div>
     <script>
+        let world = document.getElementById('world');
+        world.style.width = window.innerWidth + 'px';
+        world.style.height = (window.innerWidth / 16) * 7 + 'px';
         function hitbox(x, y, width, height) {
             this.x = x;
             this.y = y;
@@ -40,18 +52,24 @@
                 this.dom.style.top = `${this.y}px`;
                 this.dom.style.height = `${this.height}px`;
                 this.dom.style.width = `${this.width}px`;
-                document.body.appendChild(this.dom);
+                world.appendChild(this.dom);
             }
 
             creature.prototype.move = function () { //PUTS THAT DOM OBJECT IN ITS PLACE
                 this.x += this.momX;
-                this.y += this.momY;
                 for(let i = 0; i < wallArr.length; i++){
                 if(collision(this, wallArr[i])){
                 this.x -= this.momX;
+                }
+
+                this.y += this.momY;
+                for(let i = 0; i < wallArr.length; i++){
+                if(collision(this, wallArr[i])){
                 this.y -= this.momY;
                 }
                 }
+                }
+
                 this.dom.style.left = `${this.x}px`;
                 this.dom.style.top = `${this.y}px`;
             }
