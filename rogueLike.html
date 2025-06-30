@@ -113,23 +113,23 @@
 
 
 
-
+        const speed = screenSize * 0.01 
         document.addEventListener("keydown", function (event) {
             event.preventDefault();
             let key = event.key;
             key = key.toLowerCase();
             switch (key) {
                 case "a":
-                    creatureArr[0].momX = -1;
+                    creatureArr[0].momX = -speed;
                     break;
                 case "d":
-                    creatureArr[0].momX = 1;
+                    creatureArr[0].momX = speed;
                     break;
                 case "w":
-                    creatureArr[0].momY = -1;
+                    creatureArr[0].momY = -speed;
                     break;
                 case "s":
-                    creatureArr[0].momY = 1;
+                    creatureArr[0].momY = speed;
                     break;
             }
         });
