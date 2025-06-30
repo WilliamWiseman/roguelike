@@ -10,29 +10,50 @@
         body {
             background-color: white;
         }
+
         .world {
-            background-color:black;
+            background-color: black;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .gameBar {
+            background-color:rgb(61, 52, 52);
             position:absolute;
             left:0;
-            top:0;
+            top:7px;    
         }
     </style>
 
     <div class="world" id="world">
     </div>
+
+    <div class="gameBar" id="gameBar">
+
+    </div>
+
     <script>
         let world = document.getElementById('world');
         world.style.width = window.innerWidth + 'px';
         world.style.height = (window.innerWidth / 16) * 7 + 'px';
+
+        let gameBar = document.getElementById('gameBar');
+        gameBar.style.width = window.innerWidth + 'px';
+        gameBar.style.height = (window.innerWidth / 16) * 1.6 + 'px';
+        gameBar.style.top = (window.innerWidth / 16) * 7 + 'px';
+
+        const screenSize = window.innerWidth / 16;
+        console.log('The screensize is:' + screenSize);
+
         function hitbox(x, y, width, height) {
             this.x = x;
-            this.y = y;
             this.width = width;
             this.height = height;
             return this;
         }
 
-        function creature(name, x, y, height, width, hp, src) {
+        function creature(name, x, y, height, width, hp, src) { //this is a creature with a sprite and bounding box
             this.name = name;
             this.maxHp = hp;
             this.hp = hp;
@@ -57,18 +78,19 @@
 
             creature.prototype.move = function () { //PUTS THAT DOM OBJECT IN ITS PLACE
                 this.x += this.momX;
-                for(let i = 0; i < wallArr.length; i++){
-                if(collision(this, wallArr[i])){
-                this.x -= this.momX;
+                for (let i = 0; i < wallArr.length; i++) {
+                    if (collision(this, wallArr[i])) {
+                        this.x -= this.momX;
+                    }
                 }
 
                 this.y += this.momY;
-                for(let i = 0; i < wallArr.length; i++){
-                if(collision(this, wallArr[i])){
-                this.y -= this.momY;
+                for (let i = 0; i < wallArr.length; i++) {
+                    if (collision(this, wallArr[i])) {
+                        this.y -= this.momY;
+                    }
                 }
-                }
-                }
+
 
                 this.dom.style.left = `${this.x}px`;
                 this.dom.style.top = `${this.y}px`;
@@ -85,7 +107,7 @@
         wallArr.push(wall);
         wall.appear();
 
-        let wall2 = new creature("wall", 200, 500   , 100, 500, 0, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/lightBrick.gif");
+        let wall2 = new creature("wall", 200, 500, 100, 500, 0, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/lightBrick.gif");
         wallArr.push(wall2);
         wall2.appear();
 
@@ -118,23 +140,23 @@
             key = key.toLowerCase();
             switch (key) {
                 case "a":
-                    if(creatureArr[0].momX < 0){
-                    creatureArr[0].momX = 0;
+                    if (creatureArr[0].momX < 0) {
+                        creatureArr[0].momX = 0;
                     }
                     break;
                 case "d":
-                    if(creatureArr[0].momX > 0){
-                    creatureArr[0].momX = 0;
+                    if (creatureArr[0].momX > 0) {
+                        creatureArr[0].momX = 0;
                     }
                     break;
                 case "w":
-                    if(creatureArr[0].momY < 0){
-                    creatureArr[0].momY = 0;
+                    if (creatureArr[0].momY < 0) {
+                        creatureArr[0].momY = 0;
                     }
                     break;
                 case "s":
-                    if(creatureArr[0].momY > 0){
-                    creatureArr[0].momY = 0;
+                    if (creatureArr[0].momY > 0) {
+                        creatureArr[0].momY = 0;
                     }
                     break;
             }
@@ -150,13 +172,13 @@
         requestAnimationFrame(gameLoop);
 
         function collision(a, b) {
-    return !(
-        ((a.y + a.height) < (b.y)) ||
-        (a.y > (b.y + b.height)) ||
-        ((a.x + a.width) < b.x) ||
-        (a.x > (b.x + b.width))
-    );
-}
+            return !(
+                ((a.y + a.height) < (b.y)) || //checks if a is higher than b's y
+                (a.y > (b.y + b.height)) || // checks if b is lower  than a's y
+                ((a.x + a.width) < b.x) || // checks if a is more left than b 
+                (a.x > (b.x + b.width))// checks if a is more tight than b
+            );
+        }
     </script>
 </body>
 
