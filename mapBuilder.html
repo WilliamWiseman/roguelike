@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+
+    <style>
+        body {
+            background-color: white;
+        }
+
+        .world {
+            background-color: black;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .gameBar {
+            background-color:rgb(61, 52, 52);
+            position:absolute;
+            left:0;
+            top:7px;    
+        }
+
+        .tiles {
+            background-image:url("https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/lightbrick.gif");
+            background-size:cover;
+            background-repeat:no-repeat;
+        }
+    </style>
+
+    <div class="world" id="world">
+    </div>
+
+    <div class="gameBar" id="gameBar">
+
+    </div>
+
+    <script>
+        const screenSize = window.innerWidth / 16;
+        let grid = [];
+         function createWorld() { // creates physical DOM grid
+            for (let z = 0; z < 16; z++) {
+                let newYarr = [];
+                let miniDiv = document.createElement('div');
+                miniDiv.style = "display:inline-block";
+                for (let i = 0; i < 7; i++) {
+                    let tile = document.createElement('div');
+                    tile.classList = "tiles";
+                    tile.style.width = `${screenSize}px`;
+                    tile.style.height = `${screenSize}px`;
+                    this.newObj = {};
+                    this.newObj.tile = tile;
+                    this.newObj.x = z;
+                    this.newObj.y = i;
+                    this.newObj.bg = "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/lightbrick.gif";
+                    newYarr.push(this.newObj);
+                    miniDiv.appendChild(tile);
+                    tile.onmouseup = function(){changeBG(this.newObj)};
+                }
+                grid.push(newYarr);
+                document.getElementById('world').appendChild(miniDiv);
+            }
+        }
+
+        createWorld();
+
+        let world = document.getElementById('world');
+        world.style.width = window.innerWidth + 'px';
+        world.style.height = (window.innerWidth / 16) * 7 + 'px';
+
+        let gameBar = document.getElementById('gameBar');
+        gameBar.style.width = window.innerWidth + 'px';
+        gameBar.style.height = (window.innerWidth / 16) * 1.6 + 'px';
+        gameBar.style.top = world.style.height
+
+        
+        console.log('The screensize is:' + screenSize);
+
+        function hitbox(x, y, width, height) {
+            this.x = x;
+            this.width = width;
+            this.height = height;
+            return this;
+        }
+
+        function changeBG(){
+            
+        }
+
+        document.addEventListener("keydown", function (event) {
+            event.preventDefault();
+            let key = event.key;
+            key = key.toLowerCase();
+            switch (key) {
+                case "1":
+
+                    break;
+                case "2":
+
+                    break;
+                case "3":
+
+                    break;
+                case "4":
+
+                    break;
+            }
+        });
+    </script>
+</body>
+
+</html>
