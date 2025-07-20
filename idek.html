@@ -15,7 +15,7 @@ const tileSize = 32;
 const map = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 1, 1, 1, 0, 0, 0, 1, 1, 0],
-  [0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+  [0, 0, 0, 1, 0, 1, 0, 0, 1, 0],
   [0, 1, 0, 0, 0, 1, 1, 0, 1, 0],
   [0, 1, 1, 1, 0, 0, 0, 0, 1, 0],
   [0, 0, 0, 1, 0, 1, 1, 1, 1, 0],
@@ -33,7 +33,7 @@ function draw() {
   for (let y = 0; y < map.length; y++) {
     for (let x = 0; x < map[y].length; x++) {
       if (map[y][x] === 1) {
-        ctx.fillStyle = 'black';
+        ctx.fillStyle = 'red';
         ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
       }
     }
@@ -49,7 +49,7 @@ function move(dx, dy) {
   if (
     newX >= 0 && newX < 10 &&
     newY >= 0 && newY < 10 &&
-    map[newY][newX] === 0
+    getColor(newX * tileSize, newY * tileSize) === 0
   ) {
     player.x = newX;
     player.y = newY;
@@ -58,18 +58,13 @@ function move(dx, dy) {
 };
 
 function getColor(x, y){
-    const imgdata = ctx.getImageDara(x, y, 1, 1);
+    const imgdata = ctx.getImageData(x, y, 1, 1);
     const red = imgdata.data[0];
-    const green = imgdata.data[1];
-    const blue = imgdata.data[2];
-    console.log(`red:${red} green:${green} blue:${blue}`);
+    return red;
 }
-
-getColor(50, 50);
 
 document.addEventListener('keydown', (e) => {
     let key = e.key.toLowerCase();
-    console.log(key);
   if (key === 'w') move(0, -1);
   if (key === 's') move(0, 1);
   if (key === 'a') move(-1, 0);
