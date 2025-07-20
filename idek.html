@@ -20,7 +20,7 @@ const map = [
   [0, 1, 1, 1, 0, 0, 0, 0, 1, 0],
   [0, 0, 0, 1, 0, 1, 1, 1, 1, 0],
   [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+  [0, 1, 1, 0, 1, 1, 1, 1, 1, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
 ];
@@ -58,11 +58,12 @@ function move(dx, dy) {
 }
 
 document.addEventListener('keydown', (e) => {
-    e.key = e.key.toLowerCase();
-  if (e.key === 'w') move(0, -1);
-  if (e.key === 's') move(0, 1);
-  if (e.key === 'a') move(-1, 0);
-  if (e.key === 'd') move(1, 0);
+    let key = e.key.toLowerCase();
+    console.log(key);
+  if (key === 'w') move(0, -1);
+  if (key === 's') move(0, 1);
+  if (key === 'a') move(-1, 0);
+  if (key === 'd') move(1, 0);
 });
 
 draw();
