@@ -65,10 +65,10 @@ function getColor(x, y){
 
 document.addEventListener('keydown', (e) => {
     let key = e.key.toLowerCase();
-  if (key === 'w') move(0, -1);
-  if (key === 's') move(0, 1);
-  if (key === 'a') move(-1, 0);
-  if (key === 'd') move(1, 0);
+  if (key === 'w' || key === 'arrowup') move(0, -1);
+  if (key === 's' || key === 'arrowdown') move(0, 1);
+  if (key === 'a' || key === 'arrowleft') move(-1, 0);
+  if (key === 'd' || key === 'arrowright') move(1, 0);
 });
 
 draw();
