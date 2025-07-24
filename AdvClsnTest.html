@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+
+    <style>
+        body {
+            background-color: white;
+        }
+
+        canvas {
+            z-index: 1;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100vw;
+        }
+
+        .fog {
+            z-index: 5;
+        }
+    </style>
+
+    <canvas id="game" width="1024" height="448"></canvas>
+    <canvas id="fog" width="1024" height="448" class="fog"></canvas>
+
+    <script>
+        let frames = 0;
+        const pixelSize = window.innerWidth / 1024;
+        const canvas = document.getElementById("game");
+        canvas.style.height = `${pixelSize * 448}px`;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        const fogCanvas = document.getElementById("fog");
+        fogCanvas.style.height = `${pixelSize * 448}px`;
+        const fogctx = fogCanvas.getContext("2d");
+
+        fogctx.fillStyle = "rgba(0, 0, 0, 0.95)";
+        fogctx.fillRect(0, 0, 1024, 448);
+
+        let fps = 60;
+        let canMove = true;
+
+        function hitbox(x, y, width, height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            return this;
+        }
+
+        function creature(name, x, y, height, width, hp, src) { //this is a creature with a sprite and bounding box
+            this.name = name;
+            this.maxHp = hp;
+            this.hp = hp;
+            this.x = x;
+            this.y = y;
+            this.height = height;
+            this.width = width;
+            this.momX = 0;
+            this.momY = 0;
+            this.index = creatureArr.length;
+            this.img = new Image();
+            this.img.src = src;
+
+            creature.prototype.appear = function () { //creates the physical DOM object and PUTS IT IN ITS PLACE
+            }
+
+            creature.prototype.move = function () {
+
+                this.x += this.momX;
+                if (
+                    getColor(this.x, this.y) !== 0 ||
+                    getColor(this.x + this.width, this.y) !== 0 ||
+                    getColor(this.x, this.y + this.height) !== 0 ||
+                    getColor(this.x + this.width, this.y + this.height) !== 0 ||
+                    this.x < 0 ||
+                    this.x + this.width > canvas.width
+                ) {
+                    this.x -= this.momX;
+                }
+                this.y += this.momY;
+                if (
+                    getColor(this.x, this.y) !== 0 ||
+                    getColor(this.x + this.width, this.y) !== 0 ||
+                    getColor(this.x, this.y + this.height) !== 0 ||
+                    getColor(this.x + this.width, this.y + this.height) !== 0 ||
+                    this.y < 0 ||
+                    this.y + this.height > canvas.height
+                ) {
+                    this.y -= this.momY;
+                }
+            };
+
+            creature.prototype.center = function () {
+                let object = {
+                    x: this.x + (this.width / 2),
+                    y: this.y + (this.height / 2)
+                }
+                return object;
+            }
+
+        }
+        let creatureArr = [];
+        let wallArr = [];
+
+        let PLAYER = new creature("Isabella", 0, 0, 64, 64, 100, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/Torch.gif");
+        creatureArr.push(PLAYER);
+        creatureArr[0].appear();
+        let wall = new hitbox(250, 100, 64, 100);
+        wallArr.push(wall);
+
+
+
+
+        document.addEventListener("keydown", function (event) {
+            event.preventDefault();
+            let key = event.key;
+            key = key.toLowerCase();
+            switch (key) {
+                case "a":
+                    creatureArr[0].momX = -3;
+                    break;
+                case "d":
+                    creatureArr[0].momX =3;
+                    break;
+                case "w":
+                    creatureArr[0].momY = -3;
+                    break;
+                case "s":
+                    creatureArr[0].momY = 3;
+                    break;
+                case "f":
+                    getFrameRate();
+            }
+        });
+
+        document.addEventListener("keyup", function (event) {
+            event.preventDefault();
+            let key = event.key;
+            key = key.toLowerCase();
+            switch (key) {
+                case "a":
+                    if (creatureArr[0].momX < 0) {
+                        creatureArr[0].momX = 0;
+                    }
+                    break;
+                case "d":
+                    if (creatureArr[0].momX > 0) {
+                        creatureArr[0].momX = 0;
+                    }
+                    break;
+                case "w":
+                    if (creatureArr[0].momY < 0) {
+                        creatureArr[0].momY = 0;
+                    }
+                    break;
+                case "s":
+                    if (creatureArr[0].momY > 0) {
+                        creatureArr[0].momY = 0;
+                    }
+                    break;
+            }
+        });
+
+        function gameLoop() {
+            draw();
+            frames++;
+            requestAnimationFrame(gameLoop);
+        }
+        requestAnimationFrame(gameLoop);
+
+        function collision(a, b) {
+            return !(
+                ((a.y + a.height) < (b.y)) || //checks if a is higher than b's y
+                (a.y > (b.y + b.height)) || // checks if b is lower  than a's y
+                ((a.x + a.width) < b.x) || // checks if a is more left than b 
+                (a.x > (b.x + b.width))// checks if a is more tight than b
+            );
+        };
+
+        function getColor(x, y) {
+            const imgdata = ctx.getImageData(x, y, 1, 1);
+            const red = imgdata.data[0];
+            return red;
+        };
+
+        let radius = 100;
+        let change = 0.05;
+        
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            fogctx.fillStyle = 'black';
+            fogctx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
+            //Show light
+            radius+= change;
+            if(radius > 105 || radius < 95){
+                change = -change;
+            }
+            light(creatureArr[0].center(), radius);
+            // Draw map
+            for (let i = 0; i < wallArr.length; i++) {
+                ctx.fillStyle = 'red';
+                ctx.fillRect(wallArr[i].x, wallArr[i].y, wallArr[i].width, wallArr[i].height);
+            }
+            //move characters. They can only move (whatever fps is set to) times a second in order to keep the speed constant.
+            if(canMove){
+            for (let i = 0; i < creatureArr.length; i++) {
+                creatureArr[i].move();
+            }
+                canMove = false;
+            setTimeout(() => {
+                canMove = true;
+            }, 1000 / fps);
+        }
+                
+
+            for (let i = 0; i < creatureArr.length; i++) {
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(creatureArr[i].x, creatureArr[i].y, creatureArr[i].width, creatureArr[i].height);
+            }
+
+        };
+        function idk() {
+            let average = Math.floor(frames / 5);
+            alert(`You average fps was:${average} over the last 5 seconds.`);
+        }
+        function getFrameRate() {
+            frames = 0;
+            setTimeout(idk, 5000);
+        }
+
+        function light(position, radius) {
+            fogctx.globalCompositeOperation = "source-over";
+            fogctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+            fogctx.beginPath();
+            fogctx.arc(position.x, position.y, radius, 0, 2 * Math.PI);
+            fogctx.fill();
+
+            fogctx.globalCompositeOperation = "destination-out";
+            fogctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+            fogctx.beginPath();
+            fogctx.arc(position.x, position.y, radius * 0.9, 0, 2 * Math.PI);
+            fogctx.fill();
+
+            // "Cut out" the center for the light
+            fogctx.beginPath();
+            fogctx.arc(position.x, position.y, radius * 0.8, 0, 2 * Math.PI);
+            fogctx.fillStyle = "rgba(0, 0, 0, 1)";
+            fogctx.fill();
+
+            // Reset composite mode for next frame
+            fogctx.globalCompositeOperation = "source-over";
+        }
+    </script>
+</body>
+
+</html>
