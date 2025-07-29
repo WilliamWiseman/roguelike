@@ -109,8 +109,6 @@
         let PLAYER = new creature("Isabella", 0, 0, 64, 64, 100, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/Torch.gif");
         creatureArr.push(PLAYER);
         creatureArr[0].appear();
-        let wall = new hitbox(250, 100, 64, 100);
-        wallArr.push(wall);
 
 
 
@@ -124,7 +122,7 @@
                     creatureArr[0].momX = -3;
                     break;
                 case "d":
-                    creatureArr[0].momX =3;
+                    creatureArr[0].momX = 3;
                     break;
                 case "w":
                     creatureArr[0].momY = -3;
@@ -189,33 +187,40 @@
 
         let radius = 100;
         let change = 0.05;
-        
+        let collisionMap = [
+        ];
+        const tileSize = 64;
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             fogctx.fillStyle = 'black';
             fogctx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
             //Show light
-            radius+= change;
-            if(radius > 105 || radius < 95){
+            radius += change;
+            if (radius > 105 || radius < 95) {
                 change = -change;
             }
             light(creatureArr[0].center(), radius);
-            // Draw map
-            for (let i = 0; i < wallArr.length; i++) {
+            // Draw collision Map
+            for (let y = 0; y < collisionMap.length; y++) {
+                for (let x = 0; x < collisionMap[y].length; x++) {
+                if (collisionMap[y][x] === 1) {
                 ctx.fillStyle = 'red';
-                ctx.fillRect(wallArr[i].x, wallArr[i].y, wallArr[i].width, wallArr[i].height);
+                ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+                    }
+                }
             }
+
             //move characters. They can only move (whatever fps is set to) times a second in order to keep the speed constant.
-            if(canMove){
-            for (let i = 0; i < creatureArr.length; i++) {
-                creatureArr[i].move();
-            }
+            if (canMove) {
+                for (let i = 0; i < creatureArr.length; i++) {
+                    creatureArr[i].move();
+                }
                 canMove = false;
-            setTimeout(() => {
-                canMove = true;
-            }, 1000 / fps);
-        }
-                
+                setTimeout(() => {
+                    canMove = true;
+                }, 1000 / fps);
+            }
+
 
             for (let i = 0; i < creatureArr.length; i++) {
                 ctx.fillStyle = 'blue';
@@ -223,6 +228,7 @@
             }
 
         };
+
         function idk() {
             let average = Math.floor(frames / 5);
             alert(`You average fps was:${average} over the last 5 seconds.`);
