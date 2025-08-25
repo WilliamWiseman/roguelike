@@ -1,116 +1,128 @@
 <!DOCTYPE html>
+
 <html>
 
-<head>
-</head>
-
 <body>
-
     <style>
+        html,
         body {
-            background-color: white;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: lightblue;
+            overflow-x: hidden;
+            overflow-y: scroll;
         }
 
-        .world {
-            background-color: black;
-            position: absolute;
-            left: 0;
+        .gameArea {
+            position: relative;
+            width: 100%;
+            height: calc(100vw / 16 * 7);
             top: 0;
-        }
+            left: 0;
+            padding: 0px;
+            margin: 0px;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            background-image: url("https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/map1.gif");
+            background-repeat: no-repeat;
+            background-size: cover;
 
-        .gameBar {
-            background-color:rgb(61, 52, 52);
-            position:absolute;
-            left:0;
-            top:7px;    
         }
 
         .tiles {
-            background-image:url("https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/lightBrick.gif");
-            background-size:cover;
-            background-repeat:no-repeat;
+            z-index: 2;
+            height: 3.125vw;
+            width: 3.125vw;
+            position: absolute;
+            background-color: transparent;
+        }
+
+        .tiles::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            opacity: 0;
+        }
+
+        .tiles:hover::after {
+            opacity: 0.2;
         }
     </style>
-
-    <div class="world" id="world">
-    </div>
-
-    <div class="gameBar" id="gameBar">
-
-    </div>
-
+    <div id="add" class="gameArea"></div>
     <script>
-        const screenSize = window.innerWidth / 16;
-        let grid = [];
-         function createWorld() { // creates physical DOM grid
-            for (let z = 0; z < 16; z++) {
+        let clicking = false;
+        let grid = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ];
+        function createWorld() {
+            for (let z = 0; z < 32; z++) {
                 let newYarr = [];
-                let miniDiv = document.createElement('div');
-                miniDiv.style = "display:inline-block";
-                for (let i = 0; i < 7; i++) {
+                for (let i = 0; i < 14; i++) {
                     let tile = document.createElement('div');
                     tile.classList = "tiles";
-                    tile.style.width = `${screenSize}px`;
-                    tile.style.height = `${screenSize}px`;
+                    tile.style.top = `${3.125 * i}vw`;
+                    tile.style.left = `${3.125 * z}vw`;
+                    tile.onmouseover = function () {
+                        if(clicking){
+                        if(grid[i][z]){
+                            grid[i][z] = 0;
+                            tile.style.opacity = "0";
+                            tile.style.backgroundColor = "black";
+                        }else{
+                            grid[i][z] = 1;
+                            tile.style.opacity = "0.2";
+                            tile.style.backgroundColor = "red";
+                        }
+                    }
+                    };
+                    tile.onclick = function () {
+                        if(clicking){
+                        if(grid[i][z]){
+                            grid[i][z] = 0;
+                            tile.style.opacity = "0";
+                            tile.style.backgroundColor = "black";
+                        }else{
+                            grid[i][z] = 1;
+                            tile.style.opacity = "0.2";
+                            tile.style.backgroundColor = "red";
+                        }
+                    }
+                    };
                     this.newObj = {};
-                    this.newObj.tile = tile;
-                    this.newObj.x = z;
-                    this.newObj.y = i;
-                    this.newObj.bg = "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/lightBrick.gif";
-                    newYarr.push(this.newObj);
-                    miniDiv.appendChild(tile);
-                    tile.onmouseup = function(){changeBG(this.newObj)};
+                    this.newObj.block = tile;
+                    document.getElementById('add').appendChild(tile); // append directly
                 }
-                grid.push(newYarr);
-                document.getElementById('world').appendChild(miniDiv);
             }
         }
-
         createWorld();
 
-        let world = document.getElementById('world');
-        world.style.width = window.innerWidth + 'px';
-        world.style.height = (window.innerWidth / 16) * 7 + 'px';
-
-        let gameBar = document.getElementById('gameBar');
-        gameBar.style.width = window.innerWidth + 'px';
-        gameBar.style.height = (window.innerWidth / 16) * 1.6 + 'px';
-        gameBar.style.top = world.style.height
-
-        
-        console.log('The screensize is:' + screenSize);
-
-        function hitbox(x, y, width, height) {
-            this.x = x;
-            this.width = width;
-            this.height = height;
-            return this;
-        }
-
-        function changeBG(){
-
-        }
-
-        document.addEventListener("keydown", function (event) {
-            event.preventDefault();
-            let key = event.key;
-            key = key.toLowerCase();
-            switch (key) {
-                case "1":
-
-                    break;
-                case "2":
-
-                    break;
-                case "3":
-
-                    break;
-                case "4":
-
-                    break;
-            }
+        document.addEventListener("mousedown", function (event) {
+            clicking = true;
         });
+        document.addEventListener("mouseup", function (event) {
+            clicking = false;
+        });
+
     </script>
+
 </body>
 
 </html>

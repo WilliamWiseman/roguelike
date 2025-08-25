@@ -40,7 +40,7 @@
         fogctx.fillStyle = "rgba(0, 0, 0, 0.95)";
         fogctx.fillRect(0, 0, 1024, 448);
 
-        let fps = 60;
+        let fps = 120;
         let canMove = true;
 
         function hitbox(x, y, width, height) {
@@ -73,9 +73,9 @@
                 this.x += this.momX;
                 if (
                     getColor(this.x, this.y) !== 0 ||
-                    getColor(this.x + this.width, this.y) !== 0 ||
-                    getColor(this.x, this.y + this.height) !== 0 ||
-                    getColor(this.x + this.width, this.y + this.height) !== 0 ||
+                    getColor(this.x + this.width -1, this.y) !== 0 ||
+                    getColor(this.x, this.y + this.height -1) !== 0 ||
+                    getColor(this.x + this.width -1, this.y + this.height -1) !== 0 ||
                     this.x < 0 ||
                     this.x + this.width > canvas.width
                 ) {
@@ -84,9 +84,9 @@
                 this.y += this.momY;
                 if (
                     getColor(this.x, this.y) !== 0 ||
-                    getColor(this.x + this.width, this.y) !== 0 ||
-                    getColor(this.x, this.y + this.height) !== 0 ||
-                    getColor(this.x + this.width, this.y + this.height) !== 0 ||
+                    getColor(this.x + this.width -1, this.y) !== 0 ||
+                    getColor(this.x, this.y + this.height -1) !== 0 ||
+                    getColor(this.x + this.width -1, this.y + this.height -1) !== 0 ||
                     this.y < 0 ||
                     this.y + this.height > canvas.height
                 ) {
@@ -119,16 +119,16 @@
             key = key.toLowerCase();
             switch (key) {
                 case "a":
-                    creatureArr[0].momX = -3;
+                    creatureArr[0].momX = -1;
                     break;
                 case "d":
-                    creatureArr[0].momX = 3;
+                    creatureArr[0].momX = 1;
                     break;
                 case "w":
-                    creatureArr[0].momY = -3;
+                    creatureArr[0].momY = -1;
                     break;
                 case "s":
-                    creatureArr[0].momY = 3;
+                    creatureArr[0].momY = 1;
                     break;
                 case "f":
                     getFrameRate();
@@ -175,7 +175,7 @@
                 ((a.y + a.height) < (b.y)) || //checks if a is higher than b's y
                 (a.y > (b.y + b.height)) || // checks if b is lower  than a's y
                 ((a.x + a.width) < b.x) || // checks if a is more left than b 
-                (a.x > (b.x + b.width))// checks if a is more tight than b
+                (a.x > (b.x + b.width))// checks if a is more right than b
             );
         };
 
@@ -187,9 +187,8 @@
 
         let radius = 100;
         let change = 0.05;
-        let collisionMap = [
-        ];
-        const tileSize = 64;
+        let collisionMap = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0],[0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0],[0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0]];
+        const tileSize = 32;
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             fogctx.fillStyle = 'black';
@@ -203,9 +202,9 @@
             // Draw collision Map
             for (let y = 0; y < collisionMap.length; y++) {
                 for (let x = 0; x < collisionMap[y].length; x++) {
-                if (collisionMap[y][x] === 1) {
-                ctx.fillStyle = 'red';
-                ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+                    if (collisionMap[y][x]) {
+                        ctx.fillStyle = 'red';
+                        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
                     }
                 }
             }
