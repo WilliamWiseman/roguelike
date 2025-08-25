@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>do it work?</title>
+    </head>
+    <body>
+        <p id="lvldisp">Level: 1</p>
+        <button onclick="saveGame()">Change file!</button>
+        <button onclick="loadGame()">Load file!</button>
+        <button onclick="level()">Level up!</button>
+        <script>
+        // A simple object to store our game data
+let gameData = {
+    playerLevel: 1
+};
+
+let object = {
+    permission:false,
+    handle:""
+}
+async function saveGame() {
+    try {
+        if(!object.permission){
+        object.handle = await window.showSaveFilePicker({
+            suggestedName: 'save.json',
+            types: [{
+                description: 'JSON Files',
+                accept: { 'application/json': ['.json'] },
+            }],
+        });
+        object.permission = true;
+    }
+
+        const jsonString = JSON.stringify(gameData);
+        const writableStream = await object.handle.createWritable();
+        await writableStream.write(jsonString);
+        await writableStream.close();
+        alert('Game saved!');
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Could not save.');
+    }
+}
+
+async function loadGame() {
+    try {
+        const [fileHandle] = await window.showOpenFilePicker({
+            types: [{
+                description: 'JSON Files',
+                accept: { 'application/json': ['.json'] },
+            }],
+        });
+
+        const file = await fileHandle.getFile();
+        const jsonString = await file.text();
+        gameData = JSON.parse(jsonString);
+        document.getElementById('lvldisp').innerText = `Level: ${gameData.playerLevel}`;
+        object.permission = true;
+        object.handle = fileHandle;
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Could not load.');
+    }
+}
+    function level(){
+        gameData.playerLevel++;
+        document.getElementById('lvldisp').innerText = `Level: ${gameData.playerLevel}`;
+    }
+</script>
+    </body>
+</html>
