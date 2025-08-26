@@ -56,7 +56,20 @@
     <div id="add" class="gameArea"></div>
     <script>
         let clicking = false;
-        let grid = [
+        let levelData = {
+            playerStart:{
+                x:0,
+                y:0
+            },
+            clsnMap:[],
+            doorPos:{
+                x:0,
+                y:0
+            },
+            chests:[]
+
+        }
+        let grid = [ //this is the collision map
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -93,8 +106,7 @@
                         }
                     }
                     };
-                    tile.onclick = function () {
-                        if(clicking){
+                    tile.onmousedown = function () {
                         if(grid[i][z]){
                             grid[i][z] = 0;
                             tile.style.opacity = "0";
@@ -104,7 +116,6 @@
                             tile.style.opacity = "0.2";
                             tile.style.backgroundColor = "red";
                         }
-                    }
                     };
                     this.newObj = {};
                     this.newObj.block = tile;
@@ -121,8 +132,15 @@
             clicking = false;
         });
 
+        function chest(x, y, chance){
+            this.x = x;
+            this.y = y;
+            this.chance = chance;
+        }
+
     </script>
 
 </body>
 
+</html>
 </html>
