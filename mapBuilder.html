@@ -67,7 +67,10 @@
                 y:0
             },
             chests:[]
-
+        }
+        let mousePos = {
+            x:0,
+            y:0
         }
         let grid = [ //this is the collision map
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -138,9 +141,23 @@
             this.chance = chance;
         }
 
+        document.addEventListener("keyup", function (event) {
+            event.preventDefault();
+            let key = event.key;
+            key = key.toLowerCase();
+            switch (key) {
+                case " ":
+                    placeChest();
+                    break;
+            }
+        });
+
+        function placeChest(){
+            alert('it runs');
+        }
+
     </script>
 
 </body>
 
-</html>
 </html>
