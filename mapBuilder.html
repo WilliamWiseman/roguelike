@@ -24,7 +24,7 @@
             margin: 0px;
             overflow-x: hidden;
             overflow-y: scroll;
-            background-image: url("https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/map1.gif");
+            background-image: url("images/map1.gif");
             background-repeat: no-repeat;
             background-size: cover;
 
@@ -55,7 +55,9 @@
     </style>
     <div id="add" class="gameArea"></div>
     <script>
+        const pixelSize = window.innerWidth / 1024;
         let clicking = false;
+
         let levelData = {
             playerStart:{
                 x:0,
@@ -66,8 +68,10 @@
                 x:0,
                 y:0
             },
-            chests:[]
+            chests:[],
+            pic:"images/map1.gif"
         }
+
         let mousePos = {
             x:0,
             y:0
@@ -108,6 +112,8 @@
                             tile.style.backgroundColor = "red";
                         }
                     }
+                    mousePos.x = z;
+                    mousePos.y = i;
                     };
                     tile.onmousedown = function () {
                         if(grid[i][z]){
@@ -153,11 +159,19 @@
         });
 
         function placeChest(){
-            alert('it runs');
+            let CHEST = document.createElement('img');
+            CHEST.src = "images/chest.gif";
+            CHEST.style = `position:absolute;width:${64 * pixelSize}px;height:${64 * pixelSize}px`;
+            CHEST.style.top = `${mousePos.y * 32 * pixelSize}px`;
+            CHEST.style.left = `${mousePos.x * 32 * pixelSize}px`;
+            document.body.appendChild(CHEST);
+            let chance = prompt('What percentage chance should the chest spawn?');
+            levelData.chests.push(new chest(mousePos.x * 32, mousePos.y * 32, chance * 1));
+            console.log(levelData);
         }
 
     </script>
 
 </body>
 
-</html>
+   </html>
