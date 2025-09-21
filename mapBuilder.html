@@ -59,17 +59,17 @@
         let clicking = false;
 
         let levelData = {
-            playerStart:{
+            start:{
                 x:0,
                 y:0
             },
             clsnMap:[],
-            doorPos:{
+            door:{
                 x:0,
                 y:0
             },
             chests:[],
-            pic:"images/map1.gif"
+            src:"images/map1.gif"
         }
 
         let mousePos = {
@@ -153,7 +153,16 @@
             key = key.toLowerCase();
             switch (key) {
                 case " ":
-                    placeChest();
+                        placeChest();
+                    break;
+                    case "q":
+                        placeSpawn();
+                    break;
+                    case "e":
+                        placeExit();
+                    break;
+                    case "l":
+                        save();
                     break;
             }
         });
@@ -169,6 +178,60 @@
             levelData.chests.push(new chest(mousePos.x * 32, mousePos.y * 32, chance * 1));
             console.log(levelData);
         }
+        let spawn;
+        let exit;
+        function placeSpawn(){
+            if(spawn === undefined){
+            spawn = document.createElement('img');
+            spawn.src = "images/door.gif";
+            spawn.style = `position:absolute;width:${64 * pixelSize}px;height:${64 * pixelSize}px`;
+            }
+            spawn.style.top = `${mousePos.y * 32 * pixelSize}px`;
+            spawn.style.left = `${mousePos.x * 32 * pixelSize}px`;
+            document.body.appendChild(spawn);
+            levelData.start = {
+                x:mousePos.x * 32,
+                y:(mousePos.y + 1) * 32
+                };
+            console.log(levelData);
+        }
+
+        function placeExit(){
+            if(exit === undefined){
+            exit = document.createElement('img');
+            exit.src = "images/door.gif";
+            exit.style = `position:absolute;width:${64 * pixelSize}px;height:${64 * pixelSize}px`;
+            }
+            exit.style.top = `${mousePos.y * 32 * pixelSize}px`;
+            exit.style.left = `${mousePos.x * 32 * pixelSize}px`;
+            document.body.appendChild(exit);
+            levelData.door = {
+                x:mousePos.x * 32,
+                y:(mousePos.y + 1) * 32
+                };
+            console.log(levelData); 
+        }
+
+        async function save() {
+    try {
+        handle = await window.showSaveFilePicker({
+            suggestedName: 'save.json',
+            types: [{
+                description: 'JSON Files',
+                accept: { 'application/json': ['.json'] },
+            }],
+        });
+        levelData.clsnMap = grid;
+        const jsonString = JSON.stringify(levelData);
+        const writableStream = await handle.createWritable();
+        await writableStream.write(jsonString);
+        await writableStream.close();
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Could not save.');
+    }
+}
 
     </script>
 
