@@ -22,9 +22,23 @@
         .fog {
             z-index: 5;
         }
+        .background {
+            top:0;
+            left:0;
+            position:absolute;
+            width:100%;
+            z-index:2;
+        }
+        .entity {
+            position:absolute;
+            top:0;
+            left:0;
+            z-index:3;
+        }
     </style>
 
     <canvas id="game" width="1024" height="448"></canvas>
+    <img class="background">
     <canvas id="fog" width="1024" height="448" class="fog"></canvas>
 
     <script>
@@ -36,6 +50,8 @@
         const fogCanvas = document.getElementById("fog");
         fogCanvas.style.height = `${pixelSize * 448}px`;
         const fogctx = fogCanvas.getContext("2d");
+        
+        let levels = ["https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/levels/1.json"];
 
         fogctx.fillStyle = "rgba(0, 0, 0, 0.95)";
         fogctx.fillRect(0, 0, 1024, 448);
@@ -62,13 +78,22 @@
             this.momX = 0;
             this.momY = 0;
             this.index = creatureArr.length;
-            this.img = new Image();
-            this.img.src = src;
+            this.img = false;
 
             creature.prototype.appear = function () { //creates the physical DOM object and PUTS IT IN ITS PLACE
+                this.img = document.createElement('img');
+                this.img.class = "entity";
+                this.img.style.top = `${this.y * tileSize}px`;
+                this.img.style.left = `${this.x * tileSize}px`;
+                this.img.style.width = `${this.width * tileSize}px`;
+                this.img.style.height = `${this.height * tileSize}px`;
             }
 
             creature.prototype.move = function () {
+
+                if(!this.img){
+                    this.appear();
+                }
 
                 this.x += this.momX;
                 if (
@@ -92,6 +117,10 @@
                 ) {
                     this.y -= this.momY;
                 }
+
+                this.img.style.top = `${this.y * tileSize}px`;
+                this.img.style.left = `${this.x * tileSize}px`;
+
             };
 
             creature.prototype.center = function () {
@@ -106,9 +135,8 @@
         let creatureArr = [];
         let wallArr = [];
 
-        let PLAYER = new creature("Isabella", 0, 0, 64, 64, 100, "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/Torch.gif");
+        let PLAYER = new creature("KNIGHT", 0, 0, 64, 64, 100, "/images/chest.gif");
         creatureArr.push(PLAYER);
-        creatureArr[0].appear();
 
 
 
@@ -189,8 +217,8 @@
         let change = 0.05;
         let collisionMap = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0],[0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0],[0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0]];
         const tileSize = 32;
+
         function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             fogctx.fillStyle = 'black';
             fogctx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
             //Show light
@@ -218,12 +246,6 @@
                 setTimeout(() => {
                     canMove = true;
                 }, 1000 / fps);
-            }
-
-
-            for (let i = 0; i < creatureArr.length; i++) {
-                ctx.fillStyle = 'blue';
-                ctx.fillRect(creatureArr[i].x, creatureArr[i].y, creatureArr[i].width, creatureArr[i].height);
             }
 
         };
@@ -259,6 +281,39 @@
             // Reset composite mode for next frame
             fogctx.globalCompositeOperation = "source-over";
         }
+
+        function loadLevel(){
+        //pick a random level
+        let key = Math.floor(Math.random() * levels.length);
+        let level = loadJSON(levels[key]);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        creatureArr[0].x = level.start.x;
+        creatureArr[0].y = level.start.y + tileSize;
+
+        for (let y = 0; y < level.clsnMap.length; y++) {
+                for (let x = 0; x < level.clsnMap[y].length; x++) {
+                    if (level.clsnMap[y][x]) {
+                        ctx.fillStyle = 'red';
+                        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+                    }
+                }
+            }
+
+        }
+
+        async function loadJSON(path) {
+  try {
+    const response = await fetch(path);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching JSON:', error);
+  }
+}
+loadLevel();
     </script>
 </body>
 
