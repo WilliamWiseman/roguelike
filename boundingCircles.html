@@ -28,8 +28,10 @@
                 this.y = y;
                 this.rad = rad;
                 this.element = document.getElementById(id);
-                this.element.style.left = `${this.x}px;`;
-                this.element.style.top = `${this.y}px;`;
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                this.element.style.width = `${this.rad * 2}px`;
+                this.element.style.height = `${this.rad * 2}px`;
                 return this;
             }
             let circ1 = new circle(100, 150, 30, 'a');
@@ -46,4 +48,4 @@
             alert(collision(circ1, circ2));
         </script>
     </body>
-</html>                                                                                         
+</html>                                                                                                                                                                        
