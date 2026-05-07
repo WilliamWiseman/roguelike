@@ -50,38 +50,11 @@
                 let right = b.x >= a.x;
                 let deg = getAngle(a, b, up, right);
                 //alert(`Up:${up} Right:${right} Degrees:${deg}`);
-                a.element.style.rotate = `${deg}deg`;
+                a.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${deg}deg)`;
             }
 
             function getAngle(a, b, up, right){
-                let xDist = 0;
-                let yDist = 0;
-                let deg = 0;
-                if(right){
-                    if(up){
-                        xDist = b.x - a.x;
-                        yDist = a.y - b.y;
-                        deg = Math.atan(xDist / yDist) * (180 / Math.PI);
-                        return deg;
-                    }else{
-                        xDist = b.x - a.x;
-                        yDist = b.y - a.y;
-                        deg = Math.atan(yDist / xDist) * (180 / Math.PI) + 90;
-                        return deg;
-                    }
-                }else{
-                    if(up){
-                        xDist = a.x - b.x;
-                        yDist = a.y - b.y;
-                        deg = 360 - Math.atan(xDist/yDist) * (180 / Math.PI);
-                        return deg;
-                    }else{
-                        xDist = a.x - b.x;
-                        yDist = b.y - a.y;
-                        deg = 360 - Math.atan(yDist/xDist) * (180 / Math.PI) - 90;
-                        return deg;
-                    }
-                }
+                return Math.atan2(b.y - a.y, b.x - a.x) * (180 / Math.PI) + 90;
             }
 
             document.addEventListener('mousedown', (event) => {
