@@ -37,12 +37,37 @@
                 return this;
             }
 
-            let circ1 = new circle(100, 350, 30, 'b');
+            let bulletSpeed = 100;
+
+            function bullet(x, y, deg, momX, momY, rad){
+                this.x = x;
+                this.y = y;
+                this.rad = rad;
+                this.deg = deg;
+                this.momX = momX;
+                this.momY = momY;
+                this.active = true;
+
+                bullet.prototype.move(){
+                    this.x+= Math.floor(this.momX * dt);
+                    this.y+= Math.floor(this.momY * dt);
+                    this.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${deg}deg)`;
+
+                }
+
+                return this;
+            }
+
+            let circ1 = new circle(100, 100, 30, 'b');
             let circ2 = new circle(100, 100, 30, 'a');
 
+            function distance(a, b){
+                return Math.sqrt( (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+            }
+
             function collision(a, b){
-                let distance = Math.sqrt( (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
-                return distance < a.rad + b.rad
+                let distance = distance(a, b);
+                return distance < a.rad + b.rad;
             }
 
             function point(a, b){
@@ -66,6 +91,19 @@
             });
 
             point(circ2, circ1);
+
+            let lastTime = performance.now();
+            let dt;
+
+        function gameLoop(){
+            dt = (now - lastTime) / 1000;
+            
+            dt = Math.min(dt, 0.5);
+
+                
+
+            lastTime = now;
+        }
 
         </script>
     </body>
