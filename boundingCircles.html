@@ -6,6 +6,12 @@
     <body>
 
         <style>
+            html{
+                height:100%;
+            }
+            body{
+                height:100%;
+            }
             div{
                 position:absolute;
                 background-color:red;
@@ -23,6 +29,8 @@
 
         <div id="b"></div>
 
+
+
         <script>
 
             function circle(x, y, rad, id){
@@ -37,7 +45,7 @@
                 return this;
             }
 
-            let bulletSpeed = 100;
+            let bulletSpeed = 1000;
 
             function bullet(x, y, deg, momX, momY, rad){
                 this.x = x;
@@ -48,15 +56,30 @@
                 this.momY = momY;
                 this.active = true;
 
-                bullet.prototype.move(){
-                    this.x+= Math.floor(this.momX * dt);
-                    this.y+= Math.floor(this.momY * dt);
-                    this.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${deg}deg)`;
+                this.element = document.createElement('div');
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                this.element.style.width = `${this.rad * 2}px`;
+                this.element.style.height = `${this.rad * 2}px`;
+                this.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${deg}deg)`;
+                document.body.appendChild(this.element);
 
+                bullet.prototype.move = function(){
+                    this.x+= Math.floor(this.momX * dt * 100) / 100;
+                    this.y+= Math.floor(this.momY * dt * 100) / 100;
+                    this.element.style.left = `${this.x}px`;
+                    this.element.style.top = `${this.y}px`;
+                    if(collision(this, circ1)){
+                        this.active = false;
+                        this.element.remove();
+                        alert('bang');
+                    }
                 }
 
                 return this;
             }
+
+            let bulletArr = [];
 
             let circ1 = new circle(100, 100, 30, 'b');
             let circ2 = new circle(100, 100, 30, 'a');
@@ -66,19 +89,19 @@
             }
 
             function collision(a, b){
-                let distance = distance(a, b);
-                return distance < a.rad + b.rad;
+                let dist = distance(a, b);
+                return dist < a.rad + b.rad;
             }
 
             function point(a, b){
-                let up = b.y < a.y;
-                let right = b.x >= a.x;
-                let deg = getAngle(a, b, up, right);
+                let deg = getAngle(a, b);
                 //alert(`Up:${up} Right:${right} Degrees:${deg}`);
+                let ratio = bulletSpeed / distance(a, b);
+                bulletArr.push(new bullet(a.x, a.y, deg, (b.x - a.x) * ratio, (b.y - a.y) * ratio, 2));
                 a.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${deg}deg)`;
             }
 
-            function getAngle(a, b, up, right){
+            function getAngle(a, b){
                 return Math.atan2(b.y - a.y, b.x - a.x) * (180 / Math.PI) + 90;
             }
 
@@ -90,20 +113,28 @@
                 point(circ2, circ1);
             });
 
-            point(circ2, circ1);
-
             let lastTime = performance.now();
             let dt;
 
-        function gameLoop(){
+        function gameLoop(now){
             dt = (now - lastTime) / 1000;
             
             dt = Math.min(dt, 0.5);
 
-                
+                    let newArr = [];
+
+                for(let i = 0; i < bulletArr.length; i++){
+                    bulletArr[i].move();
+                    if(bulletArr[i].active){
+                        newArr.push(bulletArr[i]);
+                    }
+                }
+                    bulletArr = newArr;
 
             lastTime = now;
+            requestAnimationFrame(gameLoop);
         }
+        requestAnimationFrame(gameLoop);
 
         </script>
     </body>
