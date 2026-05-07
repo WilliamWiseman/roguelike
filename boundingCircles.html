@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Circle collision!</title>
+    </head>
+    <body>
+
+        <style>
+            div{
+                position:absolute;
+                background-color:red;
+                transform: translateX(-50%) translateY(-50%);
+                border-radius:50%;
+            }
+            img{
+                position:absolute;
+                transform: translateX(-50%) translateY(-50%);
+                border:1px solid red;
+            }
+        </style>
+
+        <img id="a" src="https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/pointer.gif">
+
+        <div id="b"></div>
+
+        <script>
+
+            function circle(x, y, rad, id){
+                this.x = x;
+                this.y = y;
+                this.rad = rad;
+                this.element = document.getElementById(id);
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                this.element.style.width = `${this.rad * 2}px`;
+                this.element.style.height = `${this.rad * 2}px`;
+                return this;
+            }
+
+            let circ1 = new circle(100, 350, 30, 'b');
+            let circ2 = new circle(100, 100, 30, 'a');
+
+            function collision(a, b){
+                let distance = Math.sqrt( (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+                return distance < a.rad + b.rad
+            }
+
+            function point(a, b){
+                let up = b.y < a.y;
+                let right = b.x >= a.x;
+                let deg = getAngle(a, b, up, right);
+                //alert(`Up:${up} Right:${right} Degrees:${deg}`);
+                a.element.style.rotate = `${deg}deg`;
+            }
+
+            function getAngle(a, b, up, right){
+                let xDist = 0;
+                let yDist = 0;
+                let deg = 0;
+                if(right){
+                    if(up){
+                        xDist = b.x - a.x;
+                        yDist = a.y - b.y;
+                        deg = Math.atan(xDist / yDist) * (180 / Math.PI);
+                        return deg;
+                    }else{
+                        xDist = b.x - a.x;
+                        yDist = b.y - a.y;
+                        deg = Math.atan(yDist / xDist) * (180 / Math.PI) + 90;
+                        return deg;
+                    }
+                }else{
+                    if(up){
+                        xDist = a.x - b.x;
+                        yDist = a.y - b.y;
+                        deg = 360 - Math.atan(xDist/yDist) * (180 / Math.PI);
+                        return deg;
+                    }else{
+                        xDist = a.x - b.x;
+                        yDist = b.y - a.y;
+                        deg = 360 - Math.atan(yDist/xDist) * (180 / Math.PI) - 90;
+                        return deg;
+                    }
+                }
+            }
+
+            document.addEventListener('mousedown', (event) => {
+                circ1.x = event.offsetX;
+                circ1.y = event.offsetY;
+                circ1.element.style.left = `${circ1.x}px`;
+                circ1.element.style.top = `${circ1.y}px`;
+                point(circ2, circ1);
+            });
+
+            point(circ2, circ1);
+
+        </script>
+    </body>
+</html>
