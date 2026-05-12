@@ -17,37 +17,40 @@
                 background-color:red;
                 transform: translateX(-50%) translateY(-50%);
                 border-radius:50%;
+                z-index:2;
             }
             img{
                 position:absolute;
                 transform: translateX(-50%) translateY(-50%);
                 border:1px solid red;
+                z-index:2;
+            }
+            .hud{
+                transform: translateX(0) translateY(0);
+                position:absolute;
+                width:100%;
+                height:100%;
+                top:0;
+                left:0;
+                border:0px solid transparent;
+                z-index:100;
             }
         </style>
-
-        <img id="a" src="https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/pointer.gif">
-
-        <div id="b"></div>
-
-
-
+            <img src="images/hud.gif" class="hud" id="hud">
         <script>
 
-            function circle(x, y, rad, id){
+            let hud = document.getElementById('hud');
+
+            function circle(x, y, rad){
                 this.x = x;
                 this.y = y;
                 this.rad = rad;
-                this.element = document.getElementById(id);
-                this.element.style.left = `${this.x}px`;
-                this.element.style.top = `${this.y}px`;
-                this.element.style.width = `${this.rad * 2}px`;
-                this.element.style.height = `${this.rad * 2}px`;
                 return this;
             }
 
             let bulletSpeed = 1000;
 
-            function bullet(x, y, deg, momX, momY, rad){
+            function arrow(x, y, deg, momX, momY, rad){
                 this.x = x;
                 this.y = y;
                 this.rad = rad;
@@ -56,33 +59,86 @@
                 this.momY = momY;
                 this.active = true;
 
-                this.element = document.createElement('div');
+                this.element = document.createElement('img');
+                this.element.src = 'images/arrow.gif';
                 this.element.style.left = `${this.x}px`;
                 this.element.style.top = `${this.y}px`;
-                this.element.style.width = `${this.rad * 2}px`;
-                this.element.style.height = `${this.rad * 2}px`;
+                this.element.style.width = `${9}px`;
+                this.element.style.height = `${27}px`;
                 this.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${deg}deg)`;
                 document.body.appendChild(this.element);
 
-                bullet.prototype.move = function(){
+                arrow.prototype.move = function(){
                     this.x+= Math.floor(this.momX * dt * 100) / 100;
                     this.y+= Math.floor(this.momY * dt * 100) / 100;
                     this.element.style.left = `${this.x}px`;
                     this.element.style.top = `${this.y}px`;
-                    if(collision(this, circ1)){
+                    for(let i = 0; i < enemies.length; i++){
+                    if(collision(this, enemies[i])){
                         this.active = false;
                         this.element.remove();
                         alert('bang');
                     }
                 }
+                }
 
                 return this;
             }
 
-            let bulletArr = [];
+            let mouse = {
+                x:0,
+                y:0
+            }
 
-            let circ1 = new circle(100, 100, 30, 'b');
-            let circ2 = new circle(100, 100, 30, 'a');
+            function player(x, y, rad, weapon){
+                this.x = x;
+                this.y = y;
+                this.rad = rad;
+                this.weapon = weapon;
+                this.momX = 0;
+                this.momY = 0;
+                this.element = document.createElement('img');
+                this.element.src = "https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/chest.gif";
+                this.element.style.width = `${this.rad * 2}px`;
+                this.element.style.height = `${this.rad * 2}px`;
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                document.body.appendChild(this.element);
+
+                player.prototype.move = function(){
+                    this.x += this.momX * dt;
+                    this.y += this.momY * dt;
+                    this.element.style.left = `${this.x}px`;
+                    this.element.style.top = `${this.y}px`;
+                }
+
+                player.prototype.atk = function(){
+                    this.weapon.attack();
+                }
+
+            }
+
+            function bow(damage, speed, sprite){
+                this.x = 0;
+                this.y = 0;
+                this.damage = damage;
+                this.speed = bulletSpeed;
+                this.speed = speed;
+                this.element = document.createElement('img');
+                this.element.src = sprite;
+                this.element.style.width = '140px';
+                this.element.style.height = '140px';
+                document.body.appendChild(this.element);
+                this.deg = 0;
+
+                bow.prototype.attack = function(){
+                    let ratio = this.speed / distance(this, mouse);
+                    bulletArr.push(new arrow(this.x, this.y, this.deg, (mouse.x - this.x) * ratio, (mouse.y - this.y) * ratio, 2));
+                }
+            }
+
+            let bulletArr = [];
+            let enemies = [];
 
             function distance(a, b){
                 return Math.sqrt( (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
@@ -96,8 +152,8 @@
             function point(a, b){
                 let deg = getAngle(a, b);
                 //alert(`Up:${up} Right:${right} Degrees:${deg}`);
-                let ratio = bulletSpeed / distance(a, b);
-                bulletArr.push(new bullet(a.x, a.y, deg, (b.x - a.x) * ratio, (b.y - a.y) * ratio, 2));
+                //let ratio = bulletSpeed / distance(a, b);
+                //bulletArr.push(new bullet(a.x, a.y, deg, (b.x - a.x) * ratio, (b.y - a.y) * ratio, 2));
                 a.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${deg}deg)`;
             }
 
@@ -105,12 +161,63 @@
                 return Math.atan2(b.y - a.y, b.x - a.x) * (180 / Math.PI) + 90;
             }
 
-            document.addEventListener('mousedown', (event) => {
-                circ1.x = event.offsetX;
-                circ1.y = event.offsetY;
-                circ1.element.style.left = `${circ1.x}px`;
-                circ1.element.style.top = `${circ1.y}px`;
-                point(circ2, circ1);
+            let PLAYER = new player(100, 100, 40, 'none');
+
+            document.addEventListener("keydown", function (event) {
+            event.preventDefault();
+            let key = event.key;
+            key = key.toLowerCase();
+            switch (key) {
+                case "a":
+                    PLAYER.momX = -300;
+                    break;
+                case "d":
+                    PLAYER.momX = 300;
+                    break;
+                case "w":
+                    PLAYER.momY = -300;
+                    break;
+                case "s":
+                    PLAYER.momY = 300;
+                    break;
+            }
+        });
+
+        document.addEventListener("keyup", function (event) {
+            event.preventDefault();
+            let key = event.key;
+            key = key.toLowerCase();
+            switch (key) {
+                case "a":
+                    if (PLAYER.momX < 0) {
+                        PLAYER.momX = 0;
+                    }
+                    break;
+                case "d":
+                    if (PLAYER.momX > 0) {
+                        PLAYER.momX = 0;
+                    }
+                    break;
+                case "w":
+                    if (PLAYER.momY < 0) {
+                        PLAYER.momY = 0;
+                    }
+                    break;
+                case "s":
+                    if (PLAYER.momY > 0) {
+                        PLAYER.momY = 0;
+                    }
+                    break;
+            }
+        });
+
+            hud.addEventListener('mousemove', (event) => {
+                mouse.x = event.offsetX;
+                mouse.y = event.offsetY;
+            });
+
+            hud.addEventListener('mousedown', (event) => {
+
             });
 
             let lastTime = performance.now();
@@ -122,6 +229,8 @@
             dt = Math.min(dt, 0.5);
 
                     let newArr = [];
+
+                    PLAYER.move();
 
                 for(let i = 0; i < bulletArr.length; i++){
                     bulletArr[i].move();
