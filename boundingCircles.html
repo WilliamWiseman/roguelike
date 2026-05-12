@@ -108,8 +108,17 @@
                 player.prototype.move = function(){
                     this.x += this.momX * dt;
                     this.y += this.momY * dt;
+                    //position player
                     this.element.style.left = `${this.x}px`;
                     this.element.style.top = `${this.y}px`;
+                    //position weapon
+                    this.weapon.element.style.left = `${this.x}px`;
+                    this.weapon.element.style.top = `${this.y}px`;
+                    if(this.momX !== 0 || this.momY !== 0){
+                        PLAYER.weapon.deg = getAngle(PLAYER, mouse);
+                        PLAYER.weapon.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${PLAYER.weapon.deg}deg)`;
+
+                    }
                 }
 
                 player.prototype.atk = function(){
@@ -119,8 +128,6 @@
             }
 
             function bow(damage, speed, sprite){
-                this.x = 0;
-                this.y = 0;
                 this.damage = damage;
                 this.speed = bulletSpeed;
                 this.speed = speed;
@@ -132,8 +139,8 @@
                 this.deg = 0;
 
                 bow.prototype.attack = function(){
-                    let ratio = this.speed / distance(this, mouse);
-                    bulletArr.push(new arrow(this.x, this.y, this.deg, (mouse.x - this.x) * ratio, (mouse.y - this.y) * ratio, 2));
+                    let ratio = this.speed / distance(PLAYER, mouse);
+                    bulletArr.push(new arrow(PLAYER.x, PLAYER.y, this.deg, (mouse.x - PLAYER.x) * ratio, (mouse.y - PLAYER.y) * ratio, 2));
                 }
             }
 
@@ -151,9 +158,6 @@
 
             function point(a, b){
                 let deg = getAngle(a, b);
-                //alert(`Up:${up} Right:${right} Degrees:${deg}`);
-                //let ratio = bulletSpeed / distance(a, b);
-                //bulletArr.push(new bullet(a.x, a.y, deg, (b.x - a.x) * ratio, (b.y - a.y) * ratio, 2));
                 a.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${deg}deg)`;
             }
 
@@ -161,7 +165,7 @@
                 return Math.atan2(b.y - a.y, b.x - a.x) * (180 / Math.PI) + 90;
             }
 
-            let PLAYER = new player(100, 100, 40, 'none');
+            let PLAYER = new player(100, 100, 40, new bow(1, 1000, 'images/bow.gif'));
 
             document.addEventListener("keydown", function (event) {
             event.preventDefault();
@@ -214,10 +218,13 @@
             hud.addEventListener('mousemove', (event) => {
                 mouse.x = event.offsetX;
                 mouse.y = event.offsetY;
+                PLAYER.weapon.deg = getAngle(PLAYER, mouse);
+                PLAYER.weapon.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${PLAYER.weapon.deg}deg)`;
+
             });
 
             hud.addEventListener('mousedown', (event) => {
-
+                PLAYER.atk();
             });
 
             let lastTime = performance.now();
