@@ -36,7 +36,7 @@
                 z-index:100;
             }
         </style>
-            <img src="images/hud.gif" class="hud" id="hud">
+            <img src="https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/hud.gif" class="hud" id="hud">
         <script>
 
             let hud = document.getElementById('hud');
@@ -60,11 +60,11 @@
                 this.active = true;
 
                 this.element = document.createElement('img');
-                this.element.src = 'images/arrow.gif';
+                this.element.src = 'https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/arrow.gif';
                 this.element.style.left = `${this.x}px`;
                 this.element.style.top = `${this.y}px`;
-                this.element.style.width = `${9}px`;
-                this.element.style.height = `${27}px`;
+                this.element.style.width = `${12}px`;
+                this.element.style.height = `${36}px`;
                 this.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${deg}deg)`;
                 document.body.appendChild(this.element);
 
@@ -112,11 +112,14 @@
                     this.element.style.left = `${this.x}px`;
                     this.element.style.top = `${this.y}px`;
                     //position weapon
-                    this.weapon.element.style.left = `${this.x}px`;
-                    this.weapon.element.style.top = `${this.y}px`;
+                    PLAYER.weapon.element.style.left = `${this.weapon.x}px`;
+                    PLAYER.weapon.element.style.top = `${this.weapon.y}px`;
                     if(this.momX !== 0 || this.momY !== 0){
-                        PLAYER.weapon.deg = getAngle(PLAYER, mouse);
-                        PLAYER.weapon.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${PLAYER.weapon.deg}deg)`;
+                        this.weapon.deg = getAngle(PLAYER, mouse);
+                        this.weapon.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${PLAYER.weapon.deg}deg)`;
+                        let ratio = 40 / distance(this, mouse);
+                        this.weapon.x = ((mouse.x - this.x) * ratio) + this.x;
+                        this.weapon.y = ((mouse.y - this.y) * ratio) + this.y;
 
                     }
                 }
@@ -128,19 +131,21 @@
             }
 
             function bow(damage, speed, sprite){
+                this.x = 0;
+                this.y = 0;
                 this.damage = damage;
                 this.speed = bulletSpeed;
                 this.speed = speed;
                 this.element = document.createElement('img');
                 this.element.src = sprite;
-                this.element.style.width = '140px';
-                this.element.style.height = '140px';
+                this.element.style.width = '105px';
+                this.element.style.height = '105px';
                 document.body.appendChild(this.element);
                 this.deg = 0;
 
                 bow.prototype.attack = function(){
                     let ratio = this.speed / distance(PLAYER, mouse);
-                    bulletArr.push(new arrow(PLAYER.x, PLAYER.y, this.deg, (mouse.x - PLAYER.x) * ratio, (mouse.y - PLAYER.y) * ratio, 2));
+                    bulletArr.push(new arrow(this.x, this.y, this.deg, (mouse.x - PLAYER.x) * ratio, (mouse.y - PLAYER.y) * ratio, 2));
                 }
             }
 
@@ -165,7 +170,7 @@
                 return Math.atan2(b.y - a.y, b.x - a.x) * (180 / Math.PI) + 90;
             }
 
-            let PLAYER = new player(100, 100, 40, new bow(1, 1000, 'images/bow.gif'));
+            let PLAYER = new player(100, 100, 40, new bow(1, 100, 'https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/bow.gif'));
 
             document.addEventListener("keydown", function (event) {
             event.preventDefault();
@@ -220,7 +225,11 @@
                 mouse.y = event.offsetY;
                 PLAYER.weapon.deg = getAngle(PLAYER, mouse);
                 PLAYER.weapon.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${PLAYER.weapon.deg}deg)`;
-
+                let ratio = 40 / distance(PLAYER, mouse);
+                PLAYER.weapon.x = ((mouse.x - PLAYER.x) * ratio) + PLAYER.x;
+                PLAYER.weapon.y = ((mouse.y - PLAYER.y) * ratio) + PLAYER.y;
+                PLAYER.weapon.element.style.left = `${PLAYER.weapon.x}px`;
+                PLAYER.weapon.element.style.top = `${PLAYER.weapon.y}px`;
             });
 
             hud.addEventListener('mousedown', (event) => {
