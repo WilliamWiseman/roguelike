@@ -48,46 +48,10 @@
                 return this;
             }
 
-            let bulletSpeed = 1000;
-
-            function arrow(x, y, deg, momX, momY, rad){
-                this.x = x;
-                this.y = y;
-                this.rad = rad;
-                this.deg = deg;
-                this.momX = momX;
-                this.momY = momY;
-                this.active = true;
-
-                this.element = document.createElement('img');
-                this.element.src = 'https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/arrow.gif';
-                this.element.style.left = `${this.x}px`;
-                this.element.style.top = `${this.y}px`;
-                this.element.style.width = `${12}px`;
-                this.element.style.height = `${36}px`;
-                this.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${deg}deg)`;
-                document.body.appendChild(this.element);
-
-                arrow.prototype.move = function(){
-                    this.x+= Math.floor(this.momX * dt * 100) / 100;
-                    this.y+= Math.floor(this.momY * dt * 100) / 100;
-                    this.element.style.left = `${this.x}px`;
-                    this.element.style.top = `${this.y}px`;
-                    for(let i = 0; i < enemies.length; i++){
-                    if(collision(this, enemies[i])){
-                        this.active = false;
-                        this.element.remove();
-                        alert('bang');
-                    }
-                }
-                }
-
-                return this;
-            }
-
             let mouse = {
                 x:0,
-                y:0
+                y:0,
+                rad:10
             }
 
             function player(x, y, rad, weapon){
@@ -111,18 +75,24 @@
                     //position player
                     this.element.style.left = `${this.x}px`;
                     this.element.style.top = `${this.y}px`;
-                    //position weapon
+                    
+                    if(collision(PLAYER.weapon, mouse)){
+                        PLAYER.weapon.currentSpeed = 0;
+                        PLAYER.weapon.element.style.left = `${this.weapon.x}px`;
+                        PLAYER.weapon.element.style.top = `${this.weapon.y}px`;
+                    }else{
+                        // if(this.weapon.currentSpeed < this.weapon.speed){
+                        //     this.weapon.currentSpeed += Math.ceil(this.weapon.speed * 0.1 * dt);
+                        // }
+                    this.weapon.deg = getAngle(PLAYER.weapon, mouse);
+                    this.weapon.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${PLAYER.weapon.deg}deg)`;
+                    let ratio = this.weapon.speed / distance(PLAYER.weapon, mouse);
+                    this.weapon.x += ratio * mouse.x - this.weapon.x * dt;
+                    this.weapon.y += ratio * mouse.y - this.weapon.y * dt;
                     PLAYER.weapon.element.style.left = `${this.weapon.x}px`;
                     PLAYER.weapon.element.style.top = `${this.weapon.y}px`;
-                    if(this.momX !== 0 || this.momY !== 0){
-                        this.weapon.deg = getAngle(PLAYER, mouse);
-                        this.weapon.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${PLAYER.weapon.deg}deg)`;
-                        let ratio = 40 / distance(this, mouse);
-                        this.weapon.x = ((mouse.x - this.x) * ratio) + this.x;
-                        this.weapon.y = ((mouse.y - this.y) * ratio) + this.y;
-
-                    }
                 }
+            }
 
                 player.prototype.atk = function(){
                     this.weapon.attack();
@@ -130,22 +100,22 @@
 
             }
 
-            function bow(damage, speed, sprite){
-                this.x = 0;
-                this.y = 0;
-                this.damage = damage;
-                this.speed = bulletSpeed;
+            function wpn(weight, speed, sharpness, sprite){
+                this.x = 500;
+                this.y = 500;
+                this.weight = weight;
                 this.speed = speed;
+                this.currentSpeed = 0;
                 this.element = document.createElement('img');
                 this.element.src = sprite;
-                this.element.style.width = '105px';
-                this.element.style.height = '105px';
+                this.element.style.width = '15px';
+                this.element.style.height = '220px';
                 document.body.appendChild(this.element);
                 this.deg = 0;
+                this.rad = 10;
 
-                bow.prototype.attack = function(){
+                wpn.prototype.attack = function(){
                     let ratio = this.speed / distance(PLAYER, mouse);
-                    bulletArr.push(new arrow(this.x, this.y, this.deg, (mouse.x - PLAYER.x) * ratio, (mouse.y - PLAYER.y) * ratio, 2));
                 }
             }
 
@@ -170,7 +140,7 @@
                 return Math.atan2(b.y - a.y, b.x - a.x) * (180 / Math.PI) + 90;
             }
 
-            let PLAYER = new player(100, 100, 40, new bow(1, 100, 'https://raw.githubusercontent.com/WilliamWiseman/roguelike/main/images/bow.gif'));
+            let PLAYER = new player(100, 10, 40, new wpn(1, 10, 1, 'images/spear.gif'));
 
             document.addEventListener("keydown", function (event) {
             event.preventDefault();
@@ -221,19 +191,17 @@
         });
 
             hud.addEventListener('mousemove', (event) => {
-                mouse.x = event.offsetX;
-                mouse.y = event.offsetY;
-                PLAYER.weapon.deg = getAngle(PLAYER, mouse);
+                mouse.x = Math.floor(event.offsetX);
+                mouse.y = Math.floor(event.offsetY);
+                PLAYER.weapon.deg = getAngle(PLAYER.weapon, mouse);
                 PLAYER.weapon.element.style.transform = `translateX(-50%) translateY(-50%) rotate(${PLAYER.weapon.deg}deg)`;
-                let ratio = 40 / distance(PLAYER, mouse);
-                PLAYER.weapon.x = ((mouse.x - PLAYER.x) * ratio) + PLAYER.x;
-                PLAYER.weapon.y = ((mouse.y - PLAYER.y) * ratio) + PLAYER.y;
                 PLAYER.weapon.element.style.left = `${PLAYER.weapon.x}px`;
                 PLAYER.weapon.element.style.top = `${PLAYER.weapon.y}px`;
             });
 
             hud.addEventListener('mousedown', (event) => {
                 PLAYER.atk();
+
             });
 
             let lastTime = performance.now();
